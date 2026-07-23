@@ -45,11 +45,9 @@
           <div class="flex gap-2">
             <select id="hora_h" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition font-medium">
               <option value="" disabled selected>Hora</option>
-              <!-- Generado dinámicamente: 00 a 23 -->
             </select>
             <select id="hora_m" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition font-medium">
               <option value="" disabled selected>Min</option>
-              <!-- Generado dinámicamente: 00 a 59 -->
             </select>
           </div>
         </div>
@@ -97,7 +95,7 @@
       <!-- Sección: Estado y Costo -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        <!-- Confirmación (Opciones desplegables / Select) -->
+        <!-- Confirmación -->
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
             <i data-lucide="check-circle-2" class="inline w-4 h-4 mr-1 text-slate-500"></i> Confirmación
@@ -133,7 +131,7 @@
       </div>
 
       <!-- Botón de Guardar -->
-      <button type="submit"
+      <button type="submit" id="btnSubmit"
         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-base py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 transform active:scale-[0.99]">
         <i data-lucide="save" class="w-5 h-5"></i>
         Guardar Registro de Viaje
@@ -142,9 +140,9 @@
     </form>
   </div>
 
-<!-- JavaScript -->
+  <!-- JavaScript -->
   <script>
-    // URL de tu Web App desplegada en Google Apps Script (¡Ya integrada!)
+    // URL de tu Web App desplegada en Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh5na_-mYsmOpwUEPwQnsqgcy2J8eeQ0_scyocHg7b1UFyvu6K7dDlJKkAuxKQIHHy/exec';
 
     // Inicializar Iconos
@@ -167,7 +165,7 @@
     // Fecha actual predeterminada
     document.getElementById('fecha').valueAsDate = new Date();
 
-    // Capturar evento del formulario
+    // Capturar envío del formulario
     document.getElementById('tripForm').addEventListener('submit', function(e) {
       e.preventDefault();
 
@@ -187,20 +185,23 @@
         nota: document.getElementById('nota').value
       };
 
+      // Enviar datos hacia Google Apps Script
       fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(datosViaje)
       })
       .then(() => {
-        alert('¡Viaje registrado con éxito en Google Sheets!');
-        document.getElementById('tripForm').reset();
-        document.getElementById('fecha').valueAsDate = new Date();
+        alert('¡Viaje registrado con éxito!');
+        
+        // Limpiar el formulario en pantalla
+        document.getElementById('tripForm').reset(); 
+        document.getElementById('fecha').valueAsDate = new Date(); // Reestablece la fecha de hoy
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('Ocurrió un error al guardar el registro.');
+        alert('Ocurrió un error al enviar el registro.');
       })
       .finally(() => {
         btn.disabled = false;
