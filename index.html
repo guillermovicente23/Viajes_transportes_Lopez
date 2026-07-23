@@ -142,12 +142,15 @@
     </form>
   </div>
 
-  <!-- Script Lógica -->
+<!-- JavaScript -->
   <script>
-    // Inicializar Iconos Lucide
+    // URL de tu Web App desplegada en Google Apps Script (¡Ya integrada!)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh5na_-mYsmOpwUEPwQnsqgcy2J8eeQ0_scyocHg7b1UFyvu6K7dDlJKkAuxKQIHHy/exec';
+
+    // Inicializar Iconos
     lucide.createIcons();
 
-    // Poblar las opciones de Hora (00 a 23) y Minutos (00 a 59)
+    // Llenar selectores de hora (00 a 23) y minutos (00 a 59)
     const selectHora = document.getElementById('hora_h');
     const selectMin = document.getElementById('hora_m');
 
@@ -161,12 +164,16 @@
       selectMin.add(new Option(`${val} min`, val));
     }
 
-    // Establecer la fecha actual de forma predeterminada
+    // Fecha actual predeterminada
     document.getElementById('fecha').valueAsDate = new Date();
 
-    // Captura de datos al enviar el formulario
+    // Capturar evento del formulario
     document.getElementById('tripForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerText = 'Guardando...';
 
       const datosViaje = {
         fecha: document.getElementById('fecha').value,
@@ -180,10 +187,26 @@
         nota: document.getElementById('nota').value
       };
 
-      console.log('Datos listos para enviar:', datosViaje);
-      alert('¡Registro guardado exitosamente en el sistema!');
-      
-      // Aquí puedes agregar el fetch() hacia tu Google Apps Script si deseas sincronizarlo con Google Sheets.
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosViaje)
+      })
+      .then(() => {
+        alert('¡Viaje registrado con éxito en Google Sheets!');
+        document.getElementById('tripForm').reset();
+        document.getElementById('fecha').valueAsDate = new Date();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al guardar el registro.');
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Guardar Registro de Viaje';
+        lucide.createIcons();
+      });
     });
   </script>
 </body>
