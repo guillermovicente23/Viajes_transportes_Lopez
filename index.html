@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrador de Viajes - Transportes López</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl border border-slate-200 overflow-hidden my-6">
+    
+    <!-- Encabezado -->
+    <div class="bg-slate-900 text-white p-6 text-center relative">
+      <h1 class="text-2xl font-bold tracking-wide flex items-center justify-center gap-2">
+        <i data-lucide="bus" class="w-7 h-7 text-amber-400"></i>
+        Registro de Viajes
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">Completa los datos del itinerario para guardar la información</p>
+    </div>
+
+    <!-- Formulario -->
+    <form id="tripForm" class="p-6 md:p-8 space-y-6">
+
+      <!-- Sección: Fecha y Hora -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Fecha (Calendario) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="calendar" class="inline w-4 h-4 mr-1 text-slate-500"></i> Fecha
+          </label>
+          <input type="date" id="fecha" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 block p-3 transition shadow-sm font-medium">
+        </div>
+
+        <!-- Hora (Horas 00-23 y Minutos 00-59) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="clock" class="inline w-4 h-4 mr-1 text-slate-500"></i> Hora
+          </label>
+          <div class="flex gap-2">
+            <select id="hora_h" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition font-medium">
+              <option value="" disabled selected>Hora</option>
+              <!-- Generado dinámicamente: 00 a 23 -->
+            </select>
+            <select id="hora_m" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition font-medium">
+              <option value="" disabled selected>Min</option>
+              <!-- Generado dinámicamente: 00 a 59 -->
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sección: Ruta -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="map-pin" class="inline w-4 h-4 mr-1 text-emerald-600"></i> Lugar de Salida
+          </label>
+          <input type="text" id="lugar_salida" placeholder="Ej. Central de Buses" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="navigation" class="inline w-4 h-4 mr-1 text-rose-600"></i> Lugar de Destino
+          </label>
+          <input type="text" id="lugar_destino" placeholder="Ej. Terminal Norte" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+      </div>
+
+      <!-- Sección: Operación y Personal -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="user-check" class="inline w-4 h-4 mr-1 text-slate-500"></i> Encargado
+          </label>
+          <input type="text" id="encargado" placeholder="Nombre del piloto o responsable" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="rotate-ccw" class="inline w-4 h-4 mr-1 text-slate-500"></i> Regreso
+          </label>
+          <input type="text" id="regreso" placeholder="Ej. Mismo día / 18:00 hrs" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+      </div>
+
+      <!-- Sección: Estado y Costo -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Confirmación (Opciones desplegables / Select) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="check-circle-2" class="inline w-4 h-4 mr-1 text-slate-500"></i> Confirmación
+          </label>
+          <select id="confirmacion" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+            <option value="Confirmado" class="text-emerald-700 font-bold">🟢 CONFIRMADO</option>
+            <option value="Pendiente" class="text-amber-600 font-bold" selected>🟡 PENDIENTE</option>
+          </select>
+        </div>
+
+        <!-- Precio -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="badge-dollar-sign" class="inline w-4 h-4 mr-1 text-emerald-600"></i> Precio
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 font-bold">Q</span>
+            <input type="number" step="0.01" id="precio" placeholder="0.00" required
+              class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 pl-8 transition font-bold">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sección: Nota -->
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+          <i data-lucide="file-text" class="inline w-4 h-4 mr-1 text-slate-500"></i> Nota
+        </label>
+        <textarea id="nota" rows="3" placeholder="Observaciones, número de unidad, pasajeros o detalles adicionales..."
+          class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition resize-none"></textarea>
+      </div>
+
+      <!-- Botón de Guardar -->
+      <button type="submit"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-base py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 transform active:scale-[0.99]">
+        <i data-lucide="save" class="w-5 h-5"></i>
+        Guardar Registro de Viaje
+      </button>
+
+    </form>
+  </div>
+
+  <!-- Script Lógica -->
+  <script>
+    // Inicializar Iconos Lucide
+    lucide.createIcons();
+
+    // Poblar las opciones de Hora (00 a 23) y Minutos (00 a 59)
+    const selectHora = document.getElementById('hora_h');
+    const selectMin = document.getElementById('hora_m');
+
+    for (let i = 0; i < 24; i++) {
+      const val = i.toString().padStart(2, '0');
+      selectHora.add(new Option(`${val} hrs`, val));
+    }
+
+    for (let i = 0; i < 60; i++) {
+      const val = i.toString().padStart(2, '0');
+      selectMin.add(new Option(`${val} min`, val));
+    }
+
+    // Establecer la fecha actual de forma predeterminada
+    document.getElementById('fecha').valueAsDate = new Date();
+
+    // Captura de datos al enviar el formulario
+    document.getElementById('tripForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const datosViaje = {
+        fecha: document.getElementById('fecha').value,
+        hora: `${document.getElementById('hora_h').value}:${document.getElementById('hora_m').value}`,
+        lugar_salida: document.getElementById('lugar_salida').value,
+        lugar_destino: document.getElementById('lugar_destino').value,
+        encargado: document.getElementById('encargado').value,
+        regreso: document.getElementById('regreso').value,
+        confirmacion: document.getElementById('confirmacion').value,
+        precio: document.getElementById('precio').value,
+        nota: document.getElementById('nota').value
+      };
+
+      console.log('Datos listos para enviar:', datosViaje);
+      alert('¡Registro guardado exitosamente en el sistema!');
+      
+      // Aquí puedes agregar el fetch() hacia tu Google Apps Script si deseas sincronizarlo con Google Sheets.
+    });
+  </script>
+</body>
+</html>
