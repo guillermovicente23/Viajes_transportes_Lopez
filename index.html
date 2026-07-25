@@ -28,7 +28,7 @@
       <!-- Sección: Fecha y Hora -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        <!-- Fecha (Calendario) -->
+        <!-- Fecha -->
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
             <i data-lucide="calendar" class="inline w-4 h-4 mr-1 text-slate-500"></i> Fecha
@@ -37,7 +37,7 @@
             class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 block p-3 transition shadow-sm font-medium">
         </div>
 
-        <!-- Hora (Horas 00-23 y Minutos 00-59) -->
+        <!-- Hora -->
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
             <i data-lucide="clock" class="inline w-4 h-4 mr-1 text-slate-500"></i> Hora
@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <!-- Sección: Operación y Personal -->
+      <!-- Sección: Personal y Contacto -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
@@ -85,10 +85,32 @@
 
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="phone" class="inline w-4 h-4 mr-1 text-slate-500"></i> Teléfono Encargado
+          </label>
+          <input type="tel" id="telefono_encargado" placeholder="Ej. 5555-1234" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+      </div>
+
+      <!-- Sección: Regreso y Permiso DGT -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
             <i data-lucide="rotate-ccw" class="inline w-4 h-4 mr-1 text-slate-500"></i> Regreso
           </label>
           <input type="text" id="regreso" placeholder="Ej. Mismo día / 18:00 hrs" required
             class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+            <i data-lucide="shield-check" class="inline w-4 h-4 mr-1 text-slate-500"></i> Permiso ante DGT
+          </label>
+          <select id="permiso_dgt" required
+            class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm font-semibold rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 p-3 transition">
+            <option value="SI" class="text-emerald-700 font-bold">🟢 SI</option>
+            <option value="NO" class="text-rose-600 font-bold" selected>🔴 NO</option>
+          </select>
         </div>
       </div>
 
@@ -142,13 +164,12 @@
 
   <!-- JavaScript -->
   <script>
-    // URL de tu Web App desplegada en Google Apps Script
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh5na_-mYsmOpwUEPwQnsqgcy2J8eeQ0_scyocHg7b1UFyvu6K7dDlJKkAuxKQIHHy/exec';
 
     // Inicializar Iconos
     lucide.createIcons();
 
-    // Llenar selectores de hora (00 a 23) y minutos (00 a 59)
+    // Llenar selectores de hora y minutos
     const selectHora = document.getElementById('hora_h');
     const selectMin = document.getElementById('hora_m');
 
@@ -179,13 +200,14 @@
         lugar_salida: document.getElementById('lugar_salida').value,
         lugar_destino: document.getElementById('lugar_destino').value,
         encargado: document.getElementById('encargado').value,
+        telefono_encargado: document.getElementById('telefono_encargado').value,
         regreso: document.getElementById('regreso').value,
+        permiso_dgt: document.getElementById('permiso_dgt').value,
         confirmacion: document.getElementById('confirmacion').value,
         precio: document.getElementById('precio').value,
         nota: document.getElementById('nota').value
       };
 
-      // Enviar datos hacia Google Apps Script
       fetch(SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -194,10 +216,8 @@
       })
       .then(() => {
         alert('¡Viaje registrado con éxito!');
-        
-        // Limpiar el formulario en pantalla
         document.getElementById('tripForm').reset(); 
-        document.getElementById('fecha').valueAsDate = new Date(); // Reestablece la fecha de hoy
+        document.getElementById('fecha').valueAsDate = new Date();
       })
       .catch(error => {
         console.error('Error:', error);
