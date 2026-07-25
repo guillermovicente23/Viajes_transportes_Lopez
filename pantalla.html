@@ -3,173 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrador de Viajes - Transportes López</title>
+  <title>Panel de Control y Alertas - Transportes López</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-6">
+<body class="bg-slate-100 min-h-screen p-4 md:p-8">
 
-  <div class="max-w-4xl mx-auto space-y-6">
+  <div class="max-w-5xl mx-auto space-y-8">
 
     <!-- Encabezado Principal -->
-    <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl text-center relative">
-      <h1 class="text-2xl font-bold tracking-wide flex items-center justify-center gap-2">
-        <i data-lucide="bus" class="w-7 h-7 text-amber-400"></i>
-        Control de Viajes y Permisos DGT
-      </h1>
-      <p class="text-slate-400 text-sm mt-1">Transportes López — Sistema de Control Interno</p>
+    <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="text-center md:text-left">
+        <h1 class="text-2xl font-bold tracking-wide flex items-center justify-center md:justify-start gap-2">
+          <i data-lucide="bus" class="w-7 h-7 text-amber-400"></i>
+          Panel de Control y Alertas
+        </h1>
+        <p class="text-slate-400 text-sm mt-1">Transportes López — Monitoreo de Viajes y Permisos DGT</p>
+      </div>
+
+      <button onclick="cargarDatos()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 shadow-md transition active:scale-95 text-sm">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Actualizar Datos
+      </button>
     </div>
 
-    <!-- SECCIÓN: ALERTAS DE PERMISOS DGT (SEMÁFORO DE DÍAS) -->
+    <!-- SECCIÓN 1: ALERTAS DE PERMISOS DGT (SEMÁFORO 1-10 DÍAS) -->
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-      <div class="bg-slate-800 text-white p-4 flex items-center justify-between">
+      <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
         <h2 class="text-lg font-bold flex items-center gap-2">
-          <i data-lucide="shield-alert" class="w-5 h-5 text-amber-400"></i>
-          Alertas de Permisos DGT (Próximos 10 días)
+          <i data-lucide="shield-alert" class="w-6 h-6 text-amber-400"></i>
+          Trámites Pendientes ante DGT (Próximos 10 días)
         </h2>
-        <button onclick="cargarDatos()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-        </button>
+        <span class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full font-semibold">Semáforo de Prioridad</span>
       </div>
 
-      <div class="p-4">
-        <div id="loadingDGT" class="text-center py-6 text-slate-500 font-medium">
-          Cargando alertas de permisos DGT...
+      <div class="p-6">
+        <div id="loadingDGT" class="text-center py-8 text-slate-500 font-medium animate-pulse flex justify-center items-center gap-2">
+          <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Cargando alertas DGT...
         </div>
 
-        <div id="listaDGT" class="grid grid-cols-1 md:grid-cols-2 gap-3 hidden">
-          <!-- Aquí se inyectan dinámicamente las tarjetas de alerta -->
+        <div id="listaDGT" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+          <!-- Tarjetas DGT dinámicas -->
         </div>
 
-        <div id="emptyDGT" class="hidden text-center py-6 text-slate-500 text-sm">
-          🟢 No hay viajes en los próximos 10 días que requieran trámite de permiso DGT.
+        <div id="emptyDGT" class="hidden text-center py-8 text-slate-600 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-sm">
+          🟢 <strong>¡Todo al día!</strong> No hay viajes programados en los próximos 10 días que requieran trámite ante la DGT.
         </div>
       </div>
     </div>
 
-    <!-- SECCIÓN: FORMULARIO DE REGISTRO -->
-    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
-      <div class="bg-amber-500 p-4 text-slate-900 font-bold flex items-center gap-2">
-        <i data-lucide="plus-circle" class="w-5 h-5"></i>
-        Registrar Nuevo Viaje
+    <!-- SECCIÓN 2: VIAJES PROGRAMADOS PARA MAÑANA -->
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div class="bg-slate-800 text-white p-5 flex items-center justify-between">
+        <h2 class="text-lg font-bold flex items-center gap-2">
+          <i data-lucide="calendar-days" class="w-6 h-6 text-emerald-400"></i>
+          Viajes Programados para Mañana
+        </h2>
+        <span id="fechaManana" class="text-xs bg-slate-700 text-emerald-300 px-3 py-1 rounded-full font-semibold">--/--/----</span>
       </div>
 
-      <form id="tripForm" class="p-6 space-y-6">
-
-        <!-- Fecha y Hora -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="calendar" class="inline w-4 h-4 mr-1 text-slate-500"></i> Fecha
-            </label>
-            <input type="date" id="fecha" required
-              class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-2 focus:ring-amber-500 p-3 transition font-medium">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="clock" class="inline w-4 h-4 mr-1 text-slate-500"></i> Hora
-            </label>
-            <div class="flex gap-2">
-              <select id="hora_h" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-3 font-medium"><option value="" disabled selected>Hora</option></select>
-              <select id="hora_m" required class="w-1/2 bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg p-3 font-medium"><option value="" disabled selected>Min</option></select>
-            </div>
-          </div>
+      <div class="p-6">
+        <div id="loadingManana" class="text-center py-8 text-slate-500 font-medium animate-pulse flex justify-center items-center gap-2">
+          <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Cargando itinerario de mañana...
         </div>
 
-        <!-- Ruta -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="map-pin" class="inline w-4 h-4 mr-1 text-emerald-600"></i> Salida
-            </label>
-            <input type="text" id="lugar_salida" placeholder="Ej. Central de Buses" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="navigation" class="inline w-4 h-4 mr-1 text-rose-600"></i> Destino
-            </label>
-            <input type="text" id="lugar_destino" placeholder="Ej. Terminal Norte" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3">
-          </div>
+        <div id="listaManana" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+          <!-- Tarjetas de viajes de mañana -->
         </div>
 
-        <!-- Personal -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="user-check" class="inline w-4 h-4 mr-1 text-slate-500"></i> Encargado
-            </label>
-            <input type="text" id="encargado" placeholder="Nombre del piloto" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="phone" class="inline w-4 h-4 mr-1 text-slate-500"></i> Teléfono
-            </label>
-            <input type="tel" id="telefono_encargado" placeholder="Ej. 5555-1234" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3">
-          </div>
+        <div id="emptyManana" class="hidden text-center py-8 text-slate-600 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-sm">
+          🚌 No hay viajes registrados en el sistema para el día de mañana.
         </div>
-
-        <!-- Regreso y Permiso DGT -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="rotate-ccw" class="inline w-4 h-4 mr-1 text-slate-500"></i> Regreso
-            </label>
-            <input type="text" id="regreso" placeholder="Ej. Mismo día / 18:00 hrs" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="shield-check" class="inline w-4 h-4 mr-1 text-slate-500"></i> ¿Permiso ante DGT?
-            </label>
-            <select id="permiso_dgt" required class="w-full bg-slate-50 border border-slate-300 text-sm font-semibold rounded-lg p-3">
-              <option value="NO" selected>🔴 NO</option>
-              <option value="SI">🟢 SI (Requiere Permiso)</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Confirmación y Precio -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="check-circle-2" class="inline w-4 h-4 mr-1 text-slate-500"></i> Confirmación
-            </label>
-            <select id="confirmacion" required class="w-full bg-slate-50 border border-slate-300 text-sm font-semibold rounded-lg p-3">
-              <option value="Confirmado">🟢 CONFIRMADO</option>
-              <option value="Pendiente" selected>🟡 PENDIENTE</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-              <i data-lucide="badge-dollar-sign" class="inline w-4 h-4 mr-1 text-emerald-600"></i> Precio
-            </label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 font-bold">Q</span>
-              <input type="number" step="0.01" id="precio" placeholder="0.00" required class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3 pl-8 font-bold">
-            </div>
-          </div>
-        </div>
-
-        <!-- Nota -->
-        <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
-            <i data-lucide="file-text" class="inline w-4 h-4 mr-1 text-slate-500"></i> Nota
-          </label>
-          <textarea id="nota" rows="2" placeholder="Observaciones, número de unidad o detalles..." class="w-full bg-slate-50 border border-slate-300 text-sm rounded-lg p-3 resize-none"></textarea>
-        </div>
-
-        <button type="submit" id="btnSubmit"
-          class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-base py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-          <i data-lucide="save" class="w-5 h-5"></i> Guardar Registro de Viaje
-        </button>
-
-      </form>
+      </div>
     </div>
 
   </div>
@@ -178,163 +84,183 @@
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh5na_-mYsmOpwUEPwQnsqgcy2J8eeQ0_scyocHg7b1UFyvu6K7dDlJKkAuxKQIHHy/exec';
 
-    // Inicializar íconos y horas
     lucide.createIcons();
-    const selectHora = document.getElementById('hora_h');
-    const selectMin = document.getElementById('hora_m');
 
-    for (let i = 0; i < 24; i++) selectHora.add(new Option(`${i.toString().padStart(2, '0')} hrs`, i.toString().padStart(2, '0')));
-    for (let i = 0; i < 60; i++) selectMin.add(new Option(`${i.toString().padStart(2, '0')} min`, i.toString().padStart(2, '0')));
-    document.getElementById('fecha').valueAsDate = new Date();
-
-    // LECTURA DE ALERTAS DGT
     async function cargarDatos() {
-      const loading = document.getElementById('loadingDGT');
-      const lista = document.getElementById('listaDGT');
-      const empty = document.getElementById('emptyDGT');
+      // Elementos DGT
+      const loadingDGT = document.getElementById('loadingDGT');
+      const listaDGT = document.getElementById('listaDGT');
+      const emptyDGT = document.getElementById('emptyDGT');
 
-      loading.classList.remove('hidden');
-      lista.classList.add('hidden');
-      empty.classList.add('hidden');
+      // Elementos Mañana
+      const loadingManana = document.getElementById('loadingManana');
+      const listaManana = document.getElementById('listaManana');
+      const emptyManana = document.getElementById('emptyManana');
+      const txtFechaManana = document.getElementById('fechaManana');
+
+      // Reset Estados
+      loadingDGT.classList.remove('hidden');
+      listaDGT.classList.add('hidden');
+      emptyDGT.classList.add('hidden');
+
+      loadingManana.classList.remove('hidden');
+      listaManana.classList.add('hidden');
+      emptyManana.classList.add('hidden');
+
+      // Fechas base
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+
+      const manana = new Date(hoy);
+      manana.setDate(manana.getDate() + 1);
+
+      // Mostrar fecha de mañana en encabezado
+      txtFechaManana.innerText = manana.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
       try {
         const res = await fetch(SCRIPT_URL);
         const viajes = await res.json();
 
-        loading.classList.add('hidden');
-        lista.innerHTML = '';
+        loadingDGT.classList.add('hidden');
+        loadingManana.classList.add('hidden');
+        listaDGT.innerHTML = '';
+        listaManana.innerHTML = '';
 
         if (!Array.isArray(viajes) || viajes.length === 0) {
-          empty.classList.remove('hidden');
+          emptyDGT.classList.remove('hidden');
+          emptyManana.classList.remove('hidden');
           return;
         }
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        // Filtrar viajes con PERMISO DGT = "SI"
-        const alertas = viajes.filter(v => {
+        // -------------------------------------------------------------
+        // 1. FILTRADO ALERTAS PERMISOS DGT (DÍAS 1 AL 10)
+        // -------------------------------------------------------------
+        const alertasDGT = viajes.filter(v => {
           if (v.permiso_dgt !== "SI" || !v.fecha) return false;
-          
-          // Ajustar formato fecha YYYY-MM-DD
+
           const partes = v.fecha.split('-');
           const fechaViaje = new Date(partes[0], partes[1] - 1, partes[2]);
           fechaViaje.setHours(0, 0, 0, 0);
 
-          const diferenciaMilisegundos = fechaViaje - hoy;
-          const diasFaltantes = Math.ceil(diferenciaMilisegundos / (1000 * 60 * 60 * 24));
+          const difMilisegundos = fechaViaje - hoy;
+          const diasFaltantes = Math.ceil(difMilisegundos / (1000 * 60 * 60 * 24));
 
-          // Solo guardamos si faltan entre 1 y 10 días
           v.diasFaltantes = diasFaltantes;
           return diasFaltantes >= 1 && diasFaltantes <= 10;
         });
 
-        if (alertas.length === 0) {
-          empty.classList.remove('hidden');
-          return;
+        if (alertasDGT.length === 0) {
+          emptyDGT.classList.remove('hidden');
+        } else {
+          // Ordenar por urgencia (menor cantidad de días primero)
+          alertasDGT.sort((a, b) => a.diasFaltantes - b.diasFaltantes);
+
+          alertasDGT.forEach(v => {
+            let estiloColor = "";
+            let badgeTexto = "";
+
+            if (v.diasFaltantes >= 8) {
+              // VERDE (10-8 días)
+              estiloColor = "border-emerald-500 bg-emerald-50 text-emerald-950";
+              badgeTexto = "bg-emerald-600 text-white";
+            } else if (v.diasFaltantes >= 4) {
+              // AMARILLO (7-4 días)
+              estiloColor = "border-amber-500 bg-amber-50 text-amber-950";
+              badgeTexto = "bg-amber-500 text-slate-900";
+            } else {
+              // ROJO (3-1 días)
+              estiloColor = "border-rose-500 bg-rose-50 text-rose-950";
+              badgeTexto = "bg-rose-600 text-white animate-pulse";
+            }
+
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-xl border-l-4 shadow-sm ${estiloColor} space-y-2 relative`;
+            card.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-xs font-bold uppercase tracking-wider opacity-75">${v.fecha} — ${v.hora} hrs</span>
+                  <h3 class="font-bold text-base leading-tight mt-0.5">${v.lugar_salida} ➔ ${v.lugar_destino}</h3>
+                </div>
+                <span class="text-xs px-2.5 py-1 rounded-full font-extrabold ${badgeTexto}">
+                  Faltan ${v.diasFaltantes} ${v.diasFaltantes === 1 ? 'día' : 'días'}
+                </span>
+              </div>
+              <div class="text-xs space-y-1 opacity-90 border-t border-slate-200/60 pt-2">
+                <p>👤 <strong>Encargado:</strong> ${v.encargado} (${v.telefono_encargado})</p>
+                <p>🔄 <strong>Regreso:</strong> ${v.regreso}</p>
+                <p>📌 <strong>Nota:</strong> ${v.nota || 'Sin observaciones'}</p>
+              </div>
+            `;
+            listaDGT.appendChild(card);
+          });
+          listaDGT.classList.remove('hidden');
         }
 
-        // Ordenar por cercanía de días (el más urgente primero)
-        alertas.sort((a, b) => a.diasFaltantes - b.diasFaltantes);
+        // -------------------------------------------------------------
+        // 2. FILTRADO VIAJES DE MAÑANA
+        // -------------------------------------------------------------
+        const viajesManana = viajes.filter(v => {
+          if (!v.fecha) return false;
+          const partes = v.fecha.split('-');
+          const fechaViaje = new Date(partes[0], partes[1] - 1, partes[2]);
+          fechaViaje.setHours(0, 0, 0, 0);
 
-        // Renderizar tarjetas con semáforo
-        alertas.forEach(v => {
-          let estiloColor = "";
-          let badgeTexto = "";
-
-          if (v.diasFaltantes >= 8) {
-            // VERDE (10-8 días)
-            estiloColor = "border-emerald-500 bg-emerald-50 text-emerald-900";
-            badgeTexto = "bg-emerald-600 text-white";
-          } else if (v.diasFaltantes >= 4) {
-            // AMARILLO (7-4 días)
-            estiloColor = "border-amber-500 bg-amber-50 text-amber-900";
-            badgeTexto = "bg-amber-500 text-slate-900";
-          } else {
-            // ROJO (3-1 días)
-            estiloColor = "border-rose-500 bg-rose-50 text-rose-900";
-            badgeTexto = "bg-rose-600 text-white animate-pulse";
-          }
-
-          const card = document.createElement('div');
-          card.className = `p-4 rounded-xl border-l-4 shadow-sm ${estiloColor} space-y-2 relative`;
-          
-          card.innerHTML = `
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-xs font-bold uppercase tracking-wider opacity-75">${v.fecha} — ${v.hora}</span>
-                <h3 class="font-bold text-base leading-tight">${v.lugar_salida} ➔ ${v.lugar_destino}</h3>
-              </div>
-              <span class="text-xs px-2.5 py-1 rounded-full font-extrabold ${badgeTexto}">
-                Faltan ${v.diasFaltantes} ${v.diasFaltantes === 1 ? 'día' : 'días'}
-              </span>
-            </div>
-
-            <div class="text-xs space-y-1 opacity-90 border-t border-slate-200/50 pt-2">
-              <p>👤 <strong>Encargado:</strong> ${v.encargado} (${v.telefono_encargado})</p>
-              <p>📌 <strong>Nota:</strong> ${v.nota || 'Sin notas adicionales'}</p>
-            </div>
-          `;
-          lista.appendChild(card);
+          return fechaViaje.getTime() === manana.getTime();
         });
 
-        lista.classList.remove('hidden');
+        if (viajesManana.length === 0) {
+          emptyManana.classList.remove('hidden');
+        } else {
+          viajesManana.forEach(v => {
+            const esConfirmado = v.confirmacion === "Confirmado";
+            const reqPermiso = v.permiso_dgt === "SI";
+
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-xl border border-slate-200 bg-slate-50 shadow-sm space-y-3`;
+            card.innerHTML = `
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="text-xs font-bold text-slate-500 uppercase">${v.hora} hrs</span>
+                  <h3 class="font-bold text-slate-800 text-base">${v.lugar_salida} ➔ ${v.lugar_destino}</h3>
+                </div>
+                <span class="text-xs px-2 py-1 rounded-md font-bold ${esConfirmado ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                  ${v.confirmacion}
+                </span>
+              </div>
+
+              <div class="flex gap-2 text-xs font-semibold">
+                <span class="px-2 py-0.5 rounded ${reqPermiso ? 'bg-rose-100 text-rose-800' : 'bg-slate-200 text-slate-700'}">
+                  ${reqPermiso ? '🛡️ Requiere DGT' : '⚪ Sin DGT'}
+                </span>
+                <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                  💵 Q${v.precio}
+                </span>
+              </div>
+
+              <div class="text-xs text-slate-600 space-y-1 border-t border-slate-200 pt-2">
+                <p>👤 <strong>Encargado:</strong> ${v.encargado} (${v.telefono_encargado})</p>
+                <p>🔄 <strong>Regreso:</strong> ${v.regreso}</p>
+                <p>📌 <strong>Nota:</strong> ${v.nota || 'Sin notas'}</p>
+              </div>
+            `;
+            listaManana.appendChild(card);
+          });
+          listaManana.classList.remove('hidden');
+        }
 
       } catch (err) {
         console.error(err);
-        loading.classList.add('hidden');
-        empty.innerText = "Error al conectar con la base de datos de Google Sheets.";
-        empty.classList.remove('hidden');
+        loadingDGT.classList.add('hidden');
+        loadingManana.classList.add('hidden');
+        emptyDGT.innerText = "Error de conexión con la base de datos.";
+        emptyDGT.classList.remove('hidden');
+      } finally {
+        lucide.createIcons();
       }
     }
 
-    // Cargar alertas al abrir la pantalla
+    // Cargar datos automáticamente al abrir la página
     cargarDatos();
-
-    // GUARDAR NUEVO VIAJE
-    document.getElementById('tripForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const btn = document.getElementById('btnSubmit');
-      btn.disabled = true;
-      btn.innerText = 'Guardando...';
-
-      const datosViaje = {
-        fecha: document.getElementById('fecha').value,
-        hora: `${document.getElementById('hora_h').value}:${document.getElementById('hora_m').value}`,
-        lugar_salida: document.getElementById('lugar_salida').value,
-        lugar_destino: document.getElementById('lugar_destino').value,
-        encargado: document.getElementById('encargado').value,
-        telefono_encargado: document.getElementById('telefono_encargado').value,
-        regreso: document.getElementById('regreso').value,
-        permiso_dgt: document.getElementById('permiso_dgt').value,
-        confirmacion: document.getElementById('confirmacion').value,
-        precio: document.getElementById('precio').value,
-        nota: document.getElementById('nota').value
-      };
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(datosViaje)
-      })
-      .then(() => {
-        alert('¡Viaje registrado con éxito!');
-        document.getElementById('tripForm').reset();
-        document.getElementById('fecha').valueAsDate = new Date();
-        cargarDatos(); // Recargar la lista de alertas DGT en tiempo real
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Ocurrió un error al enviar el registro.');
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="save" class="w-5 h-5"></i> Guardar Registro de Viaje';
-        lucide.createIcons();
-      });
-    });
   </script>
 </body>
 </html>
